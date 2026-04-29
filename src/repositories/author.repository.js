@@ -23,9 +23,15 @@ const updateAuthor = (id, data) => {
   });
 };
 
-const deleteAuthor = (id) => {
-  return prisma.author.delete({
-    where: { id },
+const deleteAuthor = async (id) => {
+  return prisma.$transaction(async (tx) => {
+    await tx.bookAuthor.deleteMany({
+      where: { authorId: id },
+    });
+
+    return tx.author.delete({
+      where: { id },
+    });
   });
 };
 

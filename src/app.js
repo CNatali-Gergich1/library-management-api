@@ -1,9 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+
 const authRoutes = require("./routes/auth.routes");
 const bookRoutes = require("./routes/book.routes");
 const authorRoutes = require("./routes/author.routes");
 const loanRoutes = require("./routes/loan.routes");
+
+const swaggerDocument = YAML.load("./openapi.yaml");
 
 const app = express();
 
@@ -15,6 +20,8 @@ app.get("/", (req, res) => {
     message: "Library Management API is running",
   });
 });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);

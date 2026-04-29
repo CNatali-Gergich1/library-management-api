@@ -1,0 +1,402 @@
+openapi: 3.0.0
+info:
+  title: Library Management API
+  version: 1.0.0
+  description: REST API for books, authors, loans, and JWT authentication.
+
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /:
+    get:
+      summary: API health check
+      responses:
+        "200":
+          description: API is running
+
+  /api/auth/signup:
+    post:
+      summary: Create a new user account
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: member@example.com
+              password: Password123!
+      responses:
+        "201":
+          description: User created
+        "400":
+          description: Missing email or password
+        "409":
+          description: Email already exists
+
+  /api/auth/login:
+    post:
+      summary: Login and receive a JWT
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              email: member@example.com
+              password: Password123!
+      responses:
+        "200":
+          description: Login successful
+        "400":
+          description: Missing email or password
+        "401":
+          description: Invalid credentials
+
+  /api/books:
+    get:
+      summary: Get all books
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of books
+        "401":
+          description: User is not authenticated
+    post:
+      summary: Create a book
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: The Hobbit
+              isbn: "9780547928227"
+              publishedYear: 1937
+              genre: Fantasy
+              copiesAvailable: 5
+      responses:
+        "201":
+          description: Book created
+        "400":
+          description: Invalid request data
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "409":
+          description: ISBN already exists
+
+  /api/books/{id}:
+    get:
+      summary: Get one book by ID
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Book found
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "404":
+          description: Book not found
+    put:
+      summary: Update a book
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              title: The Hobbit
+              isbn: "9780547928227"
+              publishedYear: 1937
+              genre: Classic Fantasy
+              copiesAvailable: 4
+      responses:
+        "200":
+          description: Book updated
+        "400":
+          description: Invalid request data
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "404":
+          description: Book not found
+        "409":
+          description: ISBN already exists
+    delete:
+      summary: Delete a book
+      tags: [Books]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Book deleted
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "404":
+          description: Book not found
+
+  /api/authors:
+    get:
+      summary: Get all authors
+      tags: [Authors]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of authors
+        "401":
+          description: User is not authenticated
+    post:
+      summary: Create an author
+      tags: [Authors]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              firstName: J.R.R.
+              lastName: Tolkien
+              bio: Author of The Hobbit
+      responses:
+        "201":
+          description: Author created
+        "400":
+          description: Invalid request data
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+
+  /api/authors/{id}:
+    get:
+      summary: Get one author by ID
+      tags: [Authors]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Author found
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "404":
+          description: Author not found
+    put:
+      summary: Update an author
+      tags: [Authors]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              firstName: John Ronald Reuel
+              lastName: Tolkien
+              bio: Author of The Hobbit and The Lord of the Rings
+      responses:
+        "200":
+          description: Author updated
+        "400":
+          description: Invalid request data
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "404":
+          description: Author not found
+    delete:
+      summary: Delete an author
+      tags: [Authors]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Author deleted
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "404":
+          description: Author not found
+
+  /api/loans:
+    get:
+      summary: Get loans
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Members see own loans; admins see all loans
+        "401":
+          description: User is not authenticated
+    post:
+      summary: Create a loan
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              bookId: 1
+              dueDate: "2026-05-15"
+      responses:
+        "201":
+          description: Loan created
+        "400":
+          description: Invalid request data or no copies available
+        "401":
+          description: User is not authenticated
+        "404":
+          description: Book not found
+
+  /api/loans/{id}:
+    get:
+      summary: Get one loan by ID
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Loan found
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "403":
+          description: User does not own this loan and is not admin
+        "404":
+          description: Loan not found
+    put:
+      summary: Update a loan
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              dueDate: "2026-05-20"
+              status: ACTIVE
+      responses:
+        "200":
+          description: Loan updated
+        "400":
+          description: Invalid request data
+        "401":
+          description: User is not authenticated
+        "403":
+          description: User is not allowed to update this loan
+        "404":
+          description: Loan not found
+    delete:
+      summary: Delete a loan
+      tags: [Loans]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Loan deleted
+        "400":
+          description: Invalid ID
+        "401":
+          description: User is not authenticated
+        "403":
+          description: Admin access required
+        "404":
+          description: Loan not found

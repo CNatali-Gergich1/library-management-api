@@ -29,9 +29,19 @@ const updateBook = (id, data) => {
   });
 };
 
-const deleteBook = (id) => {
-  return prisma.book.delete({
-    where: { id },
+const deleteBook = async (id) => {
+  return prisma.$transaction(async (tx) => {
+    await tx.bookAuthor.deleteMany({
+      where: { bookId: id },
+    });
+
+    await tx.loan.deleteMany({
+      where: { bookId: id },
+    });
+
+    return tx.book.delete({
+      where: { id },
+    });
   });
 };
 
