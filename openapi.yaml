@@ -6,6 +6,9 @@ info:
 
 servers:
   - url: http://localhost:3000
+    description: Local development server
+  - url: https://library-management-api-v2yy.onrender.com
+    description: Production server on Render
 
 components:
   securitySchemes:
